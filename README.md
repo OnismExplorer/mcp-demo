@@ -79,7 +79,7 @@ src/
 
 1. 克隆仓库：
    ```bash
-   git clone https://github.com/yourusername/projectname.git
+   git clone https://github.com/OnismExplorer/mcp-demo.git
 
 2. 配置数据源
     ```yaml
