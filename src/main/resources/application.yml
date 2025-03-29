@@ -1,0 +1,62 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update # 第一次建表为 create，后面都为 update
+  ai:
+    openai:
+      base-url: ${AI_BASE_URL}
+      api-key: ${AI_API_KEY} # 通过环境变量文件 .env 获取
+      chat:
+        options:
+          model: ${AI_MODEL}
+          temperature: 0.8
+    # 多数据源配置
+    datasources:
+      datasource:
+        - id: mysql
+          type: mysql
+          url: jdbc:mysql://localhost:5206/power_buckle?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf-8
+          username: root
+          password: 123456
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          maxPoolSize: 15
+        - id: postgres
+          type: postgres
+          url: jdbc:postgresql://localhost:5432/friends
+          username: root
+          password: 123456
+          driver-class-name: org.postgresql.Driver
+          max-pool-size: 10
+  application:
+    name: mcp-demo
+  # 邮箱配置
+  mail:
+    # 下面这个是QQ邮箱host ， 企业邮箱 : smtp.exmail.qq.com
+    host: smtp.qq.com
+    # tencent mail port  这个是固定的
+    port: 465
+    username: ${EMAIL_ADDRESS}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          socketFactory:
+            port: 465
+            class: javax.net.ssl.SSLSocketFactory
+          ssl:
+            enable: true
+server:
+  port: 8089
+
+logging:
+  file:
+    name: app.log
+    path: logs
+
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n'
+    file: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n'
+  logback:
+    rollingpolicy:
+      max-file-size: 20MB
+      max-history: 3
