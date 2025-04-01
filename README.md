@@ -3,6 +3,7 @@
 [![Java Version](https://img.shields.io/badge/java-17%2B-orange?logo=java)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/spring%20boot-3.4.4-brightgreen)](https://spring.io/projects/spring-boot)
 [![Spring AI](https://img.shields.io/badge/Spring%20AI-1.0.0%20M6-blue?logo=spring)](https://docs.spring.io/spring-ai/reference/index.html)
+[![Postgres PgVector](https://img.shields.io/badge/postgres-pgvector-blue?logo=postgresql)](https://github.com/pgvector/pgvector)
 
 最近 Spring AI 发布了 1.0.0-M6，引入了一个新特性`MCP`(Model Context Protocol)，关于这个概念在这里就不过多赘述，文档介绍的比较清楚：<br>
 - [MCP 中文文档](https://mcp-docs.cn/quickstart)
@@ -35,6 +36,17 @@
 (QQ邮箱渲染问题，可自动忽略...)
 ![img.png](src/main/resources/static/monitor1.png)
 ![img.png](src/main/resources/static/monitor2.png)
+- 整合 RAG、PgVector 向量库与本地大模型搭建知识库<br>
+创建一个`introduce.txt`文件，随便放一些大模型和网上搜不到的东西
+![img.png](src/main/resources/static/introduce.png)
+调用`/rag/upload`接口，将文件切割向量化上传至向量库<br>
+![img.png](src/main/resources/static/uploadFile.png)
+查看数据库表中，已经上传成功 <br>
+![img.png](src/main/resources/static/vectorKnowledge.png)
+![img.png](src/main/resources/static/vectorRelation.png)
+然后调用`/rag/inquire`接口，询问刚才上传上去的内容
+![img.png](src/main/resources/static/inquire.png)
+证明本地大模型(用的 nomic-embed-text )能够正确读取和处理知识库中的消息
 - ...(联网功能等等，可继续扩展)
 
 ## 技术栈
@@ -43,10 +55,12 @@
 - **数据库**: MySQL 8.0 / PostgreSQL 14 / Oracle(使用多数据源策略模式，需要多少个数据源可自行添加相关数据源依赖即可)
 - **API 文档**: Swagger 3
 - **构建工具**: Maven
-- **其他技术**: JDBC / JMX / Java Email
+- **其他技术**: JDBC / JMX / Java Email / JPA
 
 # 项目结构
 ```text
+data/ # 数据文件
+docs/ # 所需文档(命令，SQL 文件等)
 src/
 ├── main/
 │   ├── java/
@@ -55,8 +69,11 @@ src/
 │   │       ├── config/    # 配置类
 │   │       ├── constants/       # 常量类
 │   │       ├── controller/    # REST API
+│   │       ├── entity/    # 实体类
 │   │       ├── exception/         # 自定义异常类
 │   │       ├── handler/         # 处理器类
+│   │       ├── repository/         # 仓储存储接口
+│   │       ├── service/         # 提供服务类
 │   │       ├── tool/         # (LLM)封装工具类
 │   │       └── McpDemoApplication.java # 启动类
 │   └── resources/
@@ -72,6 +89,7 @@ src/
 
 - JDK 17+
 - Maven 3.8+
+- PostgreSQL(PgVector) 17
 - MySQL  / 其他数据库
 - Git
 
@@ -134,15 +152,55 @@ src/
     # DeepSeek v3 聊天模型
     AI_MODEL=$$$AI_MODEL$$$
     ```
-5. 构建项目
+5. 配置本地部署大模型(可选：这里主要是)
+推荐几个不错，可以本地适用 Ollama 部署的[嵌入式](https://zhuanlan.zhihu.com/p/164502624)模型：
+   - **nomic-embed-text**：支持长上下文窗口(最高支持 8192 token)，适合**语义搜索**、**文档聚类**等任务，最大支持向量 768 维度
+     - 适用场景：长文本语义分析、大规模知识库检索
+   - **mxbai-embed-large**：混合高精度优化模型，支持多语言，在语义搜索任务中表现优异，最大支持向量 1024 维度
+     - 适用场景：多语言语义匹配、企业级高精度检索
+   - **bge-m3**：多语言支持(支持中文、英文等)，专门为多粒度语义任务设计，最大支持向量 1024 维度
+     - 适用场景：跨语言文档检索、多粒度知识库构建
+   - **snowflake-arctic-embed**：由 Snowflake 开发，优化了多语言和长文本处理，支持动态调整上下文窗口
+     - 适用场景：企业级数据分析、多语言内容推荐
+   - **all-minilm**：轻量级模型（参数较小，33M的大小才为 67 MB，非常迷你），适合低配置设备，支持基础语义嵌入任务
+     - 适用场景：移动端应用、实时搜索
+
+    切换模型需要修改两个地方，一个是`application.yml`文件 <br>
+    ```yaml
+   ollama:
+      embedding:
+        options:
+          num-batch: 1024
+          num-ctx: 8192 # 上下文长度 token 数
+        model: nomic-embed-text # 换成其他想用的模型
+   vectorstore:
+    pgvector:
+      dimensions: 768 # 需要与表中向量维度一致(根据模型修改而修改)
+    ```
+   另一个是`/config/RagEmbeddingConfig` 中
+    ```java
+   @Bean
+    public PgVectorStore pgVectorStore(JdbcTemplate jdbcTemplate) {
+        //....
+        // 设置向量模型
+                .defaultOptions(OllamaOptions.builder().model("nomic-embed-text")
+        //...
+        // 默认是 768
+                .dimensions(768)
+        //...
+    }
+    ```
+   
+
+6. 构建项目
     ```bash
     mvn clean install
     ```
-6. 运行应用
+7. 运行应用
     ```bash
     java -jar target/mcp-demo-1.0-SNAPSHOT.jar
     ```
-7. 访问应用
+8. 访问应用
     ```bash
     http://localhost:8089/chat?message=hi
     ```

@@ -26,7 +26,6 @@ public class McpController {
     @Resource
     private ChatClient client;
 
-
     /**
      * 提供一个对外的聊天接口
      *

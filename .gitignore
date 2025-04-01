@@ -1,4 +1,6 @@
-README.md
+HELP.md
+app.log
+.env
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

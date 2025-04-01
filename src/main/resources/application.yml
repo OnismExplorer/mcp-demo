@@ -1,7 +1,11 @@
 spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ai_knowledge
+    username: root
+    password: 123456
   jpa:
     hibernate:
-      ddl-auto: update # 第一次建表为 create，后面都为 update
+      ddl-auto: validate # 第一次建表为 create，后面都为 update
   ai:
     openai:
       base-url: ${AI_BASE_URL}
@@ -10,6 +14,26 @@ spring:
         options:
           model: ${AI_MODEL}
           temperature: 0.8
+    ollama:
+      init:
+        pull-model-strategy: when_missing # 当缺失模型会自动拉取
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: qwen2.5:3b
+          temperature: 0.8
+      embedding:
+        options:
+          num-batch: 1024
+          num-ctx: 8192 # 上下文长度 token 数
+        model: nomic-embed-text
+    vectorstore:
+      pgvector:
+        index-type: hnsw # 高效近似最近邻索引
+        distance-type: cosine_distance # 相似度计算方式(余弦距离)
+        initialize-schema: false # 首次启动是否自动创建向量表(默认为 false，需要可自行打开)
+        table-name: vector_knowledge # 自行建表的话需要指定表名
+        dimensions: 768 # 需要与表中向量维度一致(nomic-embed-text 模型支持维度为 50 - 768)
     # 多数据源配置
     datasources:
       datasource:
@@ -52,7 +76,6 @@ logging:
   file:
     name: app.log
     path: logs
-
   pattern:
     console: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n'
     file: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n'
