@@ -2,11 +2,12 @@ package cn.onism.mcp.controller;
 
 import cn.onism.mcp.common.Result;
 import cn.onism.mcp.service.DocumentService;
+import cn.onism.mcp.service.search.InternetSearchService;
 import jakarta.annotation.Resource;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,8 +26,9 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/rag")
 public class RagController {
+
     @Resource
-    private OllamaChatModel ollamaChatModel;
+    private ChatClient ollamaChatClient;
 
     @Resource
     private VectorStore vectorStore;
@@ -34,11 +36,14 @@ public class RagController {
     @Resource
     private DocumentService documentService;
 
+    @Resource
+    private InternetSearchService internetSearchService;
+
     private static final String PROMPT = """
-                基于以下知识库内容回答问题：
-                {context}
-                问题：{question}
-                """;
+            基于以下知识库内容回答问题：
+            {context}
+            问题：{question}
+            """;
 
     @PostMapping("/upload")
     public Result<String> upload(@RequestParam("file") MultipartFile file) {
@@ -64,7 +69,10 @@ public class RagController {
         }
 
         // 调用大模型回答问题
-        return Result.success(ollamaChatModel.call(PROMPT.replace("{context}", context).replace("{question}", question)));
+        return Result.success(ollamaChatClient
+                .prompt(new Prompt(PROMPT.replace("{context}", context).replace("{question}", question)))
+                .call().content()
+        );
     }
 
     @GetMapping("/stream/inquire")
@@ -86,6 +94,16 @@ public class RagController {
         Prompt prompt = new Prompt(PROMPT.replace("{context}", context).replace("{question}", question));
 
         // 输出完成标识：["finishReason": "stop"]
-        return ollamaChatModel.stream(prompt);
+        return ollamaChatClient.prompt(prompt).stream().chatResponse();
+    }
+
+    @GetMapping("/search")
+    public Result<String> search(@RequestParam String question) {
+        return Result.success(internetSearchService.searXNGSearch(question));
+    }
+
+    @GetMapping("/stream/search")
+    public Flux<ChatResponse> streamSearch(@RequestParam String question) {
+        return internetSearchService.searXNGstreamSearch(question);
     }
 }

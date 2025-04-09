@@ -2,8 +2,9 @@
 
 [![Java Version](https://img.shields.io/badge/java-17%2B-orange?logo=java)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/spring%20boot-3.4.4-brightgreen)](https://spring.io/projects/spring-boot)
-[![Spring AI](https://img.shields.io/badge/Spring%20AI-1.0.0%20M6-blue?logo=spring)](https://docs.spring.io/spring-ai/reference/index.html)
+[![Spring AI](https://img.shields.io/badge/Spring%20AI-1.0.0%20M6-green?logo=spring)](https://docs.spring.io/spring-ai/reference/index.html)
 [![Postgres PgVector](https://img.shields.io/badge/postgres-pgvector-blue?logo=postgresql)](https://github.com/pgvector/pgvector)
+[![SearXNG](https://img.shields.io/badge/search-searXNG-blue?logo=searxng)](https://github.com/searxng/searxng)
 
 最近 Spring AI 发布了 1.0.0-M6，引入了一个新特性`MCP`(Model Context Protocol)，关于这个概念在这里就不过多赘述，文档介绍的比较清楚：<br>
 - [MCP 中文文档](https://mcp-docs.cn/quickstart)
@@ -47,7 +48,14 @@
 然后调用`/rag/inquire`接口，询问刚才上传上去的内容
 ![img.png](src/main/resources/static/inquire.png)
 证明本地大模型(用的 nomic-embed-text )能够正确读取和处理知识库中的消息
-- ...(联网功能等等，可继续扩展)
+- 实时联网搜索功能<br>
+使用本地化部署 SearXNG 结合 Ollama 本地化部署的大模型(当然，也可以使用其他大模型的 API)，实现本地隐私实时智能搜索<br>
+实现了两种方式的搜索：
+  1. 传统调取服务接口式搜索：封装了一个 `InternetSearchService` 服务类，通过封装请求先查询浏览器，将结果与问题封装为 Prompt 丢给大模型分析然后返回给用户答案(大模型被动处理结果，传统的函数式调用)，接口：**`/rag/search`**、**`/rag/stream/search`**(流式输出)<br>
+  ![img.png](src/main/resources/static/ragSearch.png)
+  2. 封装一个工具类，将其注入到 MCP 中，实现大模型先查询自身数据集，无结果则主动进行联网搜索，处理并返回结果<br>
+  ![img.png](src/main/resources/static/mcpSearch.png)
+- ...(其他功能，可继续扩展)
 
 ## 技术栈
 
@@ -55,6 +63,7 @@
 - **数据库**: MySQL 8.0 / PostgreSQL 14 / Oracle(使用多数据源策略模式，需要多少个数据源可自行添加相关数据源依赖即可)
 - **API 文档**: Swagger 3
 - **构建工具**: Maven
+- **搜素引擎**：[SearXNG](https://docs.searxng.org/)
 - **其他技术**: JDBC / JMX / Java Email / JPA
 
 # 项目结构
@@ -75,6 +84,7 @@ src/
 │   │       ├── repository/         # 仓储存储接口
 │   │       ├── service/         # 提供服务类
 │   │       ├── tool/         # (LLM)封装工具类
+│   │       ├── util/         # 工具类
 │   │       └── McpDemoApplication.java # 启动类
 │   └── resources/
 │       ├── application.yml    # 主配置文件
@@ -92,6 +102,7 @@ src/
 - PostgreSQL(PgVector) 17
 - MySQL  / 其他数据库
 - Git
+- SearXNG
 
 ### 安装步骤
 
@@ -190,17 +201,20 @@ src/
         //...
     }
     ```
-   
+6. 部署 `SearXNG` 搜索引擎
+这里不过多赘述，没有本地部署的可以参考下面的文章自行进行部署：
+   - [本地部署 SearXNG](https://onism.cn/article?id=105)
+   - [本地部署 SearXNG - CSDN 博客](https://blog.csdn.net/qq_73574147/article/details/147073524?spm=1001.2014.3001.5502)
 
-6. 构建项目
+7. 构建项目
     ```bash
     mvn clean install
     ```
-7. 运行应用
+8. 运行应用
     ```bash
     java -jar target/mcp-demo-1.0-SNAPSHOT.jar
     ```
-8. 访问应用
+9. 访问应用
     ```bash
     http://localhost:8089/chat?message=hi
     ```

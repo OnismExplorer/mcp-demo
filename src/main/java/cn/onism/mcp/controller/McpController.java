@@ -24,7 +24,7 @@ import java.util.List;
 public class McpController {
 
     @Resource
-    private ChatClient client;
+    private ChatClient openAiChatClient;
 
     /**
      * 提供一个对外的聊天接口
@@ -41,7 +41,7 @@ public class McpController {
         UserMessage userMessage = new UserMessage(message);
         Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
 
-        String response = client.prompt(prompt)
+        String response = openAiChatClient.prompt(prompt)
                 .call().content();
 
         return Result.success(response);
@@ -62,7 +62,7 @@ public class McpController {
         UserMessage userMessage = new UserMessage(message);
         Prompt prompt = new Prompt(List.of(systemMessage, userMessage));
 
-        return client.prompt(prompt)
+        return openAiChatClient.prompt(prompt)
                 .stream().chatResponse();
     }
 }

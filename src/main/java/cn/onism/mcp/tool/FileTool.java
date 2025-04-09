@@ -3,6 +3,7 @@ package cn.onism.mcp.tool;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -174,10 +175,12 @@ public class FileTool {
         /**
          * 文件路径
          */
+        @ToolParam(description = "文件路径")
         private String filePath;
         /**
          * 文件名
          */
+        @ToolParam(description = "文件名")
         private  String fileName;
 
         public String getFilePath() {
@@ -197,19 +200,24 @@ public class FileTool {
         /**
          * 文件路径
          */
+        @ToolParam(description = "文件路径")
         private String filePath;
 
         /**
          * 文件名
          */
+        @ToolParam(description = "文件名")
         private String fileName;
+
         /**
          * 内容
          */
+        @ToolParam(description = "需要写入文件的内容")
         private String content;
         /**
          * 是否为追加
          */
+        @ToolParam(description = "写入内容是否为追加内容")
         private boolean append;
 
 
@@ -279,6 +287,10 @@ public class FileTool {
     @Getter
     static
     class DirectoryRequest {
+        /**
+         * 文件夹路径
+         */
+        @ToolParam(description = "文件夹路径")
         private String dirPath;
     }
 }

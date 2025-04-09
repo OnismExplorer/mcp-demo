@@ -12,6 +12,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
@@ -103,16 +104,19 @@ public class EmailTool {
         /**
          * 收件人邮件
          */
+        @ToolParam(description = "收件人邮箱")
         private String email;
 
         /**
          * 主题
          */
+        @ToolParam(description = "发送邮件的标题/主题")
         private String subject;
 
         /**
          * 消息
          */
+        @ToolParam(description = "发送邮件的正文消息内容")
         private String message;
 
     }

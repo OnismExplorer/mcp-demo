@@ -1,9 +1,7 @@
 package cn.onism.mcp.config;
 
-import cn.onism.mcp.tool.DateTool;
-import cn.onism.mcp.tool.EmailTool;
-import cn.onism.mcp.tool.FileTool;
-import cn.onism.mcp.tool.MonitorTool;
+import cn.onism.mcp.service.search.SearxngSearchService;
+import cn.onism.mcp.tool.*;
 import cn.onism.mcp.tool.database.DatabaseTool;
 import cn.onism.mcp.tool.database.manage.DataSourceManager;
 import jakarta.annotation.Resource;
@@ -34,6 +32,9 @@ public class McpConfig implements WebMvcConfigurer {
     @Value("${spring.mail.username}")
     private String sendMailer;
 
+    @Resource
+    private SearxngSearchService searxngSearchService;
+
     /**
      * 添加工具回调提供程序
      *
@@ -49,7 +50,8 @@ public class McpConfig implements WebMvcConfigurer {
                         new FileTool(),
                         new DatabaseTool(manager),
                         new MonitorTool(),
-                        new EmailTool(mailSender,sendMailer)
+                        new EmailTool(mailSender,sendMailer),
+                        new InternetSearchTool(searxngSearchService)
                         // 其他工具...
                 )
                 .build();

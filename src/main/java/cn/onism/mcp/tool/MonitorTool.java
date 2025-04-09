@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import oshi.SystemInfo;
@@ -83,7 +84,7 @@ public class MonitorTool {
      */
     private static final SystemInfo SYSTEM_INFO = new SystemInfo();
 
-    @Tool(description = "获取系统资源使用率，resourceType 为资源类型，传 null 则表明获取所有资源类型(CPU、内存、线程、磁盘等)")
+    @Tool(description = "获取系统资源使用率")
     public MonitorResponse getResourceUsage(MonitorRequest request) {
         Map<String, Object> metrics = new HashMap<>();
         try {
@@ -520,6 +521,7 @@ public class MonitorTool {
         /**
          * 资源类型
          */
+        @ToolParam(required = false, description = "需要获取的系统资源类型，传 null 则表明获取所有资源类型(CPU、内存、线程、磁盘等)")
         private ResourceType resourceType;
     }
 

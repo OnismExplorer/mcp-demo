@@ -1,6 +1,7 @@
 package cn.onism.mcp.config;
 
 import jakarta.annotation.Resource;
+import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaOptions;
@@ -27,6 +28,16 @@ public class RagEmbeddingConfig {
         return new TokenTextSplitter();
     }
 
+    @Bean
+    public EmbeddingModel embeddingModel() {
+        return OllamaEmbeddingModel.builder()
+                .ollamaApi(ollamaApi)
+                // 设置向量模型
+                .defaultOptions(OllamaOptions.builder().model("nomic-embed-text")
+                        .numBatch(1024).build())
+                .build();
+    }
+
     /**
      * pg 向量库存储
      *
@@ -34,13 +45,8 @@ public class RagEmbeddingConfig {
      * @return {@link PgVectorStore }
      */
     @Bean
-    public PgVectorStore pgVectorStore(JdbcTemplate jdbcTemplate) {
-        OllamaEmbeddingModel embeddingModel = OllamaEmbeddingModel.builder()
-                .ollamaApi(ollamaApi)
-                // 设置向量模型
-                .defaultOptions(OllamaOptions.builder().model("nomic-embed-text")
-                        .numBatch(1024).build())
-                .build();
+    public PgVectorStore pgVectorStore(JdbcTemplate jdbcTemplate,EmbeddingModel embeddingModel) {
+
         return PgVectorStore.builder(jdbcTemplate, embeddingModel)
                 // 设置表名
                 .vectorTableName("vector_knowledge")
