@@ -1,5 +1,6 @@
 package cn.onism.mcp.tool;
 
+import cn.onism.mcp.annotations.McpTool;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.ai.tool.annotation.Tool;
@@ -21,6 +22,7 @@ import java.util.stream.Stream;
  * @date 2025-03-24
  */
 @Component
+@McpTool
 public class FileTool {
 
     private static final Set<String> WINDOWS_RESERVED_NAMES = Set.of(

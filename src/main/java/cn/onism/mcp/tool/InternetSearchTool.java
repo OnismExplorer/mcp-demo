@@ -1,6 +1,7 @@
 package cn.onism.mcp.tool;
 
 import cn.hutool.json.JSONUtil;
+import cn.onism.mcp.annotations.McpTool;
 import cn.onism.mcp.service.search.SearxngSearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.tool.annotation.Tool;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
+@McpTool
 public class InternetSearchTool {
 
     private final SearxngSearchService searxngSearchService;

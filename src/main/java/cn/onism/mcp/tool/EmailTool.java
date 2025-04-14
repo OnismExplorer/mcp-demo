@@ -1,5 +1,6 @@
 package cn.onism.mcp.tool;
 
+import cn.onism.mcp.annotations.McpTool;
 import cn.onism.mcp.constants.CodeEnum;
 import cn.onism.mcp.exception.CustomException;
 import com.vladsch.flexmark.html.HtmlRenderer;
@@ -32,6 +33,7 @@ import java.util.regex.Pattern;
  */
 @Slf4j
 @Component
+@McpTool
 public class EmailTool {
 
     private final JavaMailSender mailSender;

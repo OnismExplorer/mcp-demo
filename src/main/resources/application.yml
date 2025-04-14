@@ -7,11 +7,13 @@ spring:
     hibernate:
       ddl-auto: validate # 第一次建表为 create，后面都为 update
   ai:
+    chat:
+      client:
+        type: openai
     websearch:
       searxng:
         url: "http://localhost:8088/search" # SearXNG 服务的 API 地址
         nums: 25 # 返回搜索结果数量，数量越多，可能会越精确(大模型可能会被多种结果误导，产生“AI 幻觉”现象)，但是耗时会增加(默认为 20 条)
-      chat-model: ollama # 聊天模型选择(ollama/openai)
     openai:
       base-url: ${AI_BASE_URL}
       api-key: ${AI_API_KEY} # 通过环境变量文件 .env 获取

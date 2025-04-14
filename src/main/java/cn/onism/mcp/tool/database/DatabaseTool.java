@@ -1,5 +1,6 @@
 package cn.onism.mcp.tool.database;
 
+import cn.onism.mcp.annotations.McpTool;
 import cn.onism.mcp.tool.database.manage.DataSourceManager;
 import cn.onism.mcp.tool.database.strategy.DataSourceStrategy;
 import lombok.Getter;
@@ -20,6 +21,7 @@ import java.util.Map;
  * @date 2025-03-24
  */
 @Component
+@McpTool
 public class DatabaseTool {
 
     /**

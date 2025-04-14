@@ -2,6 +2,7 @@ package cn.onism.mcp.tool;
 
 import cn.hutool.json.JSONUtil;
 import cn.hutool.system.oshi.OshiUtil;
+import cn.onism.mcp.annotations.McpTool;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
+@McpTool
 public class MonitorTool {
 
     private enum MonitorResponseType {

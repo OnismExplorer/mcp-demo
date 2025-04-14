@@ -206,6 +206,18 @@ src/
    - [本地部署 SearXNG](https://onism.cn/article?id=105)
    - [本地部署 SearXNG - CSDN 博客](https://blog.csdn.net/qq_73574147/article/details/147073524?spm=1001.2014.3001.5502)
 
+    相关 `application.yml` 配置如下
+    ```yaml
+    spring:
+      ai:
+      chat:
+        client:
+          type: ollama # 目前只有 ollama(默认) 、openai 两种
+      websearch:
+        searxng:
+          url: "http://localhost:8088/search" # SearXNG 服务的 API 地址
+          nums: 25
+    ```
 7. 构建项目
     ```bash
     mvn clean install

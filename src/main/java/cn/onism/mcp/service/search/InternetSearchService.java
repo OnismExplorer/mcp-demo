@@ -1,14 +1,11 @@
 package cn.onism.mcp.service.search;
 
-import cn.onism.mcp.constants.ChatClientOption;
 import cn.onism.mcp.entity.SearchResult;
 import cn.onism.mcp.util.prompt.InternetSearchPromptBuilder;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -29,23 +26,9 @@ public class InternetSearchService {
     /**
      * 聊天客户端
      */
-    private final ChatClient chatClient;
+    @Resource
+    private ChatClient chatClient;
 
-    public InternetSearchService(
-            @Value("${spring.ai.websearch.chat-model:ollama}") ChatClientOption option,
-            @Qualifier("openAiChatClient") ChatClient openAiChatClient,
-            @Qualifier("ollamaChatClient") ChatClient ollamaChatClient) {
-        this.chatClient = selectChatModel(option, openAiChatClient, ollamaChatClient);
-    }
-
-    private ChatClient selectChatModel(ChatClientOption option, ChatClient openai, ChatClient ollama) {
-        if(ChatClientOption.OPENAI.equals(option)) {
-            return openai;
-        }
-
-        // 后续可以添加其他类型的模型
-        return ollama;
-    }
 
     /**
      * SearXNG 联网搜索
