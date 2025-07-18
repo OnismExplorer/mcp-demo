@@ -89,7 +89,7 @@ src/
 │   └── resources/
 │       ├── application.yml    # 主配置文件
 │       ├── static/           # 静态资源
-│       └── .env/        # 环境配置文件
+│       └── .env.example/        # 环境配置文件(配置完成后，将文件名改为 .env，去掉后缀 .example 即可)
 └── test/                      # 单元测试
 ```
 
