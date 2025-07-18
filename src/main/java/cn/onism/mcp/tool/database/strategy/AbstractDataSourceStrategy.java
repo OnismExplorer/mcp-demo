@@ -113,10 +113,10 @@ public abstract class AbstractDataSourceStrategy implements DataSourceStrategy {
             Object value = entry.getValue();
 
             if (value instanceof Temporal) { // 处理Java 8+时间类型
-                if (value instanceof LocalDate) {
-                    statement.setDate(index, Date.valueOf((LocalDate) value));
-                } else if (value instanceof LocalDateTime) {
-                    statement.setTimestamp(index, Timestamp.valueOf((LocalDateTime) value));
+                if (value instanceof LocalDate v) {
+                    statement.setDate(index, Date.valueOf(v));
+                } else if (value instanceof LocalDateTime v) {
+                    statement.setTimestamp(index, Timestamp.valueOf(v));
                 }
             } else {
                 statement.setObject(index, value); // 通用处理
