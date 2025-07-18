@@ -5,6 +5,7 @@
 [![Spring AI](https://img.shields.io/badge/Spring%20AI-1.0.0%20M6-green?logo=spring)](https://docs.spring.io/spring-ai/reference/index.html)
 [![Postgres PgVector](https://img.shields.io/badge/postgres-pgvector-blue?logo=postgresql)](https://github.com/pgvector/pgvector)
 [![SearXNG](https://img.shields.io/badge/search-searXNG-blue?logo=searxng)](https://github.com/searxng/searxng)
+[![Apache POI](https://img.shields.io/badge/Java%20API-Apache%20POI-red?logo=apache)](https://poi.apache.org/)
 
 最近 Spring AI 发布了 1.0.0-M6，引入了一个新特性`MCP`(Model Context Protocol)，关于这个概念在这里就不过多赘述，文档介绍的比较清楚：<br>
 - [MCP 中文文档](https://mcp-docs.cn/quickstart)
@@ -55,6 +56,10 @@
   ![img.png](src/main/resources/static/ragSearch.png)
   2. 封装一个工具类，将其注入到 MCP 中，实现大模型先查询自身数据集，无结果则主动进行联网搜索，处理并返回结果<br>
   ![img.png](src/main/resources/static/mcpSearch.png)
+- 创建/处理 Excel 相关操作
+使用 Apache POI 封装 `ExcelTool` 工具类, 为大模型赋予操作 excel 文件的能力
+![img.png](src/main/resources/static/excel.png)
+![img.png](src/main/resources/static/excelResult.png)
 - ...(其他功能，可继续扩展)
 
 ## 技术栈
@@ -64,7 +69,7 @@
 - **API 文档**: Swagger 3
 - **构建工具**: Maven
 - **搜素引擎**：[SearXNG](https://docs.searxng.org/)
-- **其他技术**: JDBC / JMX / Java Email / JPA
+- **其他技术**: JDBC / JMX / Java Email / JPA / Apache POI
 
 # 项目结构
 ```text
